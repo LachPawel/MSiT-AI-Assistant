@@ -20,47 +20,38 @@ System automatycznie streszcza akta spraw, przypomina o terminach, generuje proj
 - **Kontrola zgodności:** Weryfikacja z obowiązującym prawem
 - **Ochrona danych:** Pełna zgodność z RODO i zasadami poufności
 
-## 📚 Documentation
-
-- [**Architecture Overview**](ARCHITECTURE.md) - System design and components.
-- [**Security & Compliance**](SECURITY.md) - RODO, Guardrails, and Data Protection.
-- [**Integration Plan**](INTEGRATION_PLAN.md) - Strategy for EZD, CBOSA, and Public Registries.
-- [**Deployment Guide**](DEPLOYMENT.md) - Infrastructure and CI/CD.
-- [**Quality Assurance**](QUALITY_ASSURANCE.md) - Testing methodology and metrics.
-- [**Use Cases**](USE_CASES.md) - Detailed user scenarios.
-
-## 🛠 Tech Stack
+## 🛠 Stos Technologiczny
 
 - **Frontend:** Vue 3, TypeScript, Tailwind CSS
 - **Backend:** Node.js, Express, TypeScript
-- **Database:** PostgreSQL (Supabase)
-- **AI:** OpenAI GPT-4 Turbo, Exa.ai (Research)
-- **Security:** Zod Validation, Helmet, RLS
+- **Baza Danych:** PostgreSQL (Supabase)
+- **AI:** OpenAI GPT-4 Turbo, Exa.ai (Badania)
+- **Bezpieczeństwo:** Walidacja Zod, Helmet, RLS
 
-## 🏁 Quick Start
+## 🏁 Szybki Start
 
-### Prerequisites
+### Wymagania wstępne
 - Node.js 18+
-- Supabase Project
-- OpenAI API Key
+- Projekt Supabase
+- Klucz API OpenAI
 
-### Installation
+### Instalacja
 
-1. **Clone the repository**
+1. **Sklonuj repozytorium**
    ```bash
    git clone https://github.com/your-org/msit-assistant.git
    ```
 
-2. **Setup Backend**
+2. **Konfiguracja Backend**
    ```bash
    cd backend
    npm install
    cp .env.example .env
-   # Configure SUPABASE_URL, SUPABASE_ANON_KEY, OPENAI_API_KEY
+   # Skonfiguruj SUPABASE_URL, SUPABASE_ANON_KEY, OPENAI_API_KEY
    npm run dev
    ```
 
-3. **Setup Frontend**
+3. **Konfiguracja Frontend**
    ```bash
    cd frontend
    npm install
@@ -68,16 +59,21 @@ System automatycznie streszcza akta spraw, przypomina o terminach, generuje proj
    npm run dev
    ```
 
-4. **Initialize Database**
-   Run the SQL script located in `database/schema.sql` in your Supabase SQL Editor.
+4. **Inicjalizacja Bazy Danych**
+   Uruchom skrypt SQL znajdujący się w `database/schema.sql` w edytorze SQL Supabase.
 
-## 🛡 Security & Guardrails
+## 🛡 Bezpieczeństwo i Zabezpieczenia
 
-The system implements strict guardrails to ensure safety:
-- **PII Redaction:** All personal data is sanitized before AI processing.
-- **Legal Grounding:** AI is forced to cite specific legal articles.
-- **Human-in-the-Loop:** AI never makes final decisions; it only recommends.
+System implementuje rygorystyczne zabezpieczenia w celu zapewnienia bezpieczeństwa:
+- **Anonimizacja Danych Osobowych:** Wszystkie dane osobowe są oczyszczane przed przetwarzaniem przez AI.
+- **Podstawy Prawne:** AI musi cytować konkretne artykuły prawne.
+- **Człowiek w Pętli:** AI nigdy nie podejmuje ostatecznych decyzji; jedynie rekomenduje.
 
-## 📄 License
+## Zespół
 
-MIT License - Open Source for Public Administration.
+- Paweł Lach
+- Bartosz Idzik
+
+## 📄 Licencja
+
+Licencja MIT - Open Source dla Administracji Publicznej.
