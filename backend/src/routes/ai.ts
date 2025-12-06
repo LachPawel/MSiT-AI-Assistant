@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { supabase } from '../config/supabase';
 import { classifyCaseAgent } from '../agents/classifier';
 import { retrieveProcedures, findBestMatch } from '../agents/retriever';
-import { generateGuidance, analyzeRisk, generateDraftDecision } from '../services/openai.service';
+import { generateGuidance, analyzeRisk, generateDraftDecision, extractFundingOpportunities } from '../services/openai.service';
 import type { ChatCompletionMessageParam } from 'openai/resources/chat/completions';
 import logger from '../utils/logger';
 
@@ -52,12 +52,13 @@ router.post('/analyze/:caseId', async (req, res) => {
 
     logger.info(`Best match found: ${match.procedure.name} (score: ${match.score})`);
 
-    // Step 4: Generate guidance & Risk Analysis
-    logger.info('Step 4: Generating AI analysis (Risk & Decision)...');
+    // Step 4: Generate guidance, Risk Analysis & Extract Funding Opportunities
+    logger.info('Step 4: Generating AI analysis (Risk, Decision & Funding)...');
     
-    const [guidance, riskAnalysis] = await Promise.all([
+    const [guidance, riskAnalysis, fundingOpportunities] = await Promise.all([
       generateGuidance(caseData, match.procedure),
-      analyzeRisk(caseData, match.procedure)
+      analyzeRisk(caseData, match.procedure),
+      extractFundingOpportunities(caseData.description, caseData)
     ]);
 
     const draftDecision = await generateDraftDecision(caseData, match.procedure, riskAnalysis);
@@ -84,6 +85,34 @@ router.post('/analyze/:caseId', async (req, res) => {
 
     if (analysisError) throw analysisError;
 
+    // Store funding opportunities
+    if (fundingOpportunities && fundingOpportunities.length > 0) {
+      logger.info(`Storing ${fundingOpportunities.length} funding opportunities`);
+      
+      const fundingInserts = fundingOpportunities.map((opportunity: any) => ({
+        case_id: caseId,
+        program_name: opportunity.program_name,
+        program_code: opportunity.program_code || null,
+        description: opportunity.description,
+        funding_amount_min: opportunity.funding_amount_min || null,
+        funding_amount_max: opportunity.funding_amount_max || null,
+        application_deadline: opportunity.application_deadline || null,
+        eligibility_requirements: opportunity.eligibility_requirements || [],
+        match_relevance: opportunity.match_relevance || 0.5,
+        source_url: opportunity.source_info || null
+      }));
+
+      const { error: fundingError } = await supabase
+        .from('funding_opportunities')
+        .insert(fundingInserts);
+
+      if (fundingError) {
+        logger.error('Error storing funding opportunities', { error: fundingError });
+      } else {
+        logger.info('Funding opportunities stored successfully');
+      }
+    }
+
     // Update case
     await supabase
       .from('cases')
@@ -101,9 +130,37 @@ router.post('/analyze/:caseId', async (req, res) => {
       procedure: match.procedure,
       guidance,
       analysis,
+      fundingOpportunitiesCount: fundingOpportunities?.length || 0,
     });
   } catch (error: any) {
     logger.error('Analysis error', { error: error.message, stack: error.stack, caseId });
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get funding opportunities for a case
+router.get('/funding/:caseId', async (req, res) => {
+  const { caseId } = req.params;
+  try {
+    logger.info(`Getting funding opportunities for case ${caseId}`);
+
+    const { data: opportunities, error } = await supabase
+      .from('funding_opportunities')
+      .select('*')
+      .eq('case_id', caseId)
+      .order('match_relevance', { ascending: false })
+      .order('application_deadline', { ascending: true });
+
+    if (error) throw error;
+
+    logger.info(`Found ${opportunities?.length || 0} funding opportunities`);
+    res.json({ 
+      success: true, 
+      opportunities: opportunities || [],
+      count: opportunities?.length || 0
+    });
+  } catch (error: any) {
+    logger.error('Funding opportunities error', { error: error.message, stack: error.stack, caseId });
     res.status(500).json({ error: error.message });
   }
 });

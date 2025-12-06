@@ -78,6 +78,23 @@ export async function generateDraftDecision(caseDetails: any, procedure: any, an
   return JSON.parse(completion.choices[0].message.content || '{}');
 }
 
+export async function extractFundingOpportunities(caseDescription: string, caseDetails: any) {
+  const completion = await openai.chat.completions.create({
+    model: 'gpt-4-turbo-preview',
+    messages: [
+      { role: 'system', content: SYSTEM_PROMPT },
+      {
+        role: 'user',
+        content: `Przeanalizuj poniższą sprawę i wyodrębnij wszystkie dostępne programy finansowania/dofinansowania dla turystyki, hotelarstwa i branży HoReCa, które mogą być istotne dla wnioskodawcy.\n\nOpis sprawy: ${caseDescription}\nSzczegóły sprawy: ${JSON.stringify(caseDetails)}\n\nSzukaj informacji o:\n- Programach dofinansowania dla hoteli\n- Dotacjach na inwestycje turystyczne\n- Funduszach europejskich (POIR, PROW, FE)\n- Programach branżowych (np. HORECA)\n- Kredytach preferencyjnych\n- Programach rozwoju infrastruktury turystycznej\n\nDla każdego znalezionego programu zwróć JSON array: [{program_name: string, program_code?: string, description: string, funding_amount_min?: number, funding_amount_max?: number, application_deadline?: "YYYY-MM-DD" lub null, eligibility_requirements: string[], match_relevance: number (0.0-1.0), source_info?: string}]`
+      }
+    ],
+    response_format: { type: 'json_object' },
+  });
+  
+  const result = JSON.parse(completion.choices[0].message.content || '{"opportunities": []}');
+  return result.opportunities || [];
+}
+
 export async function generateGuidance(
   caseDetails: any,
   procedure: any,

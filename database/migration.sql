@@ -83,10 +83,30 @@ CREATE TABLE IF NOT EXISTS audit_logs (
   created_at TIMESTAMP DEFAULT NOW()
 );
 
+-- Create funding opportunities table
+CREATE TABLE IF NOT EXISTS funding_opportunities (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  case_id UUID REFERENCES cases(id) ON DELETE CASCADE,
+  program_name TEXT NOT NULL,
+  program_code TEXT,
+  description TEXT,
+  funding_amount_min DECIMAL,
+  funding_amount_max DECIMAL,
+  application_deadline DATE,
+  eligibility_requirements TEXT[],
+  match_relevance FLOAT, -- How relevant this opportunity is to the case (0-1)
+  source_url TEXT,
+  program_status TEXT DEFAULT 'active' CHECK (program_status IN ('active', 'closed', 'upcoming')),
+  discovered_at TIMESTAMP DEFAULT NOW(),
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
 -- Create indexes if they don't exist
 CREATE INDEX IF NOT EXISTS idx_case_documents_case_id ON case_documents(case_id);
 CREATE INDEX IF NOT EXISTS idx_case_deadlines_case_id ON case_deadlines(case_id);
 CREATE INDEX IF NOT EXISTS idx_audit_logs_created_at ON audit_logs(created_at);
+CREATE INDEX IF NOT EXISTS idx_funding_opportunities_case_id ON funding_opportunities(case_id);
+CREATE INDEX IF NOT EXISTS idx_funding_opportunities_deadline ON funding_opportunities(application_deadline);
 
 -- Delete old procedure data and insert new tourism procedures
 DELETE FROM procedures WHERE name = 'Dofinansowanie budowy obiektów sportowych';
