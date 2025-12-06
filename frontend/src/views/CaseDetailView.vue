@@ -57,6 +57,41 @@
               </ul>
             </div>
 
+            <!-- Risk Analysis -->
+            <div v-if="analysis.risk_score !== undefined" class="rounded-lg p-4 border" :class="analysis.risk_score > 0.5 ? 'bg-red-50 border-red-200' : 'bg-green-50 border-green-200'">
+              <h3 class="font-semibold mb-3 flex items-center gap-2" :class="analysis.risk_score > 0.5 ? 'text-red-900' : 'text-green-900'">
+                <svg v-if="analysis.risk_score > 0.5" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                Analiza Ryzyka (Score: {{ Math.round(analysis.risk_score * 100) }}%)
+              </h3>
+              
+              <div v-if="analysis.risk_flags?.length" class="mb-3">
+                <p class="font-medium text-sm mb-1">Zidentyfikowane ryzyka:</p>
+                <ul class="list-disc list-inside text-sm space-y-1">
+                  <li v-for="(flag, i) in analysis.risk_flags" :key="i">{{ flag }}</li>
+                </ul>
+              </div>
+
+              <div v-if="analysis.recommended_action" class="text-sm font-medium mt-2">
+                Rekomendacja: {{ analysis.recommended_action }}
+              </div>
+            </div>
+
+            <!-- Draft Decision -->
+            <div v-if="analysis.draft_decision" class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+              <h3 class="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                Projekt Decyzji
+              </h3>
+              <div class="bg-gray-50 p-4 rounded border border-gray-200 font-mono text-sm whitespace-pre-wrap mb-4">
+                {{ analysis.draft_decision }}
+              </div>
+              
+              <div v-if="analysis.legal_basis_analysis" class="text-sm text-gray-600 bg-blue-50 p-3 rounded">
+                <strong>Analiza prawna:</strong> {{ analysis.legal_basis_analysis }}
+              </div>
+            </div>
+
             <div v-if="analysis.reasoning" class="bg-gray-50 rounded-lg p-4">
               <h3 class="font-semibold text-gray-900 mb-3">Szczegółowe wskazówki:</h3>
               <div class="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">{{ analysis.reasoning }}</div>

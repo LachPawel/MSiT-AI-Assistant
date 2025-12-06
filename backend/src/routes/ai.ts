@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { supabase } from '../config/supabase';
 import { classifyCaseAgent } from '../agents/classifier';
 import { retrieveProcedures, findBestMatch } from '../agents/retriever';
-import { generateGuidance } from '../services/openai.service';
+import { generateGuidance, analyzeRisk, generateDraftDecision } from '../services/openai.service';
 import type { ChatCompletionMessageParam } from 'openai/resources/chat/completions';
 import logger from '../utils/logger';
 
@@ -52,10 +52,17 @@ router.post('/analyze/:caseId', async (req, res) => {
 
     logger.info(`Best match found: ${match.procedure.name} (score: ${match.score})`);
 
-    // Step 4: Generate guidance
-    logger.info('Step 4: Generating AI guidance...');
-    const guidance = await generateGuidance(caseData, match.procedure);
-    logger.info('Guidance generated successfully');
+    // Step 4: Generate guidance & Risk Analysis
+    logger.info('Step 4: Generating AI analysis (Risk & Decision)...');
+    
+    const [guidance, riskAnalysis] = await Promise.all([
+      generateGuidance(caseData, match.procedure),
+      analyzeRisk(caseData, match.procedure)
+    ]);
+
+    const draftDecision = await generateDraftDecision(caseData, match.procedure, riskAnalysis);
+
+    logger.info('Analysis generated successfully');
 
     // Store analysis
     const { data: analysis, error: analysisError } = await supabase
@@ -65,8 +72,12 @@ router.post('/analyze/:caseId', async (req, res) => {
         matched_procedure_id: match.procedure.id,
         confidence_score: match.score,
         reasoning: guidance,
-        missing_documents: [],
-        risk_flags: [],
+        missing_documents: riskAnalysis.missing_documents || [],
+        risk_flags: riskAnalysis.risk_flags || [],
+        risk_score: riskAnalysis.risk_score,
+        draft_decision: draftDecision.draft_content,
+        legal_basis_analysis: draftDecision.legal_basis_analysis,
+        recommended_action: riskAnalysis.recommended_action
       })
       .select()
       .single();
