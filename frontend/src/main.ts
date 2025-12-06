@@ -6,8 +6,8 @@ import './style.css';
 
 import CaseForm from './components/CaseForm.vue';
 import CaseDetailView from './views/CaseDetailView.vue';
-
 import CasesListView from './views/CasesListView.vue';
+import OfficerDashboardView from './views/OfficerDashboardView.vue';
 
 const router = createRouter({
   history: createWebHistory(),
@@ -15,6 +15,7 @@ const router = createRouter({
     { path: '/', component: CaseForm },
     { path: '/cases', component: CasesListView },
     { path: '/cases/:id', component: CaseDetailView },
+    { path: '/officer', component: OfficerDashboardView },
   ],
 });
 

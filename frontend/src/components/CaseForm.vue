@@ -1,13 +1,16 @@
 <template>
-  <div class="max-w-3xl mx-auto p-6">
-    <div class="bg-white rounded-lg shadow-lg p-8">
-      <div class="flex items-center justify-between mb-6">
-        <h2 class="text-3xl font-bold">Nowy Wniosek</h2>
-        <router-link
-          to="/cases"
-          class="text-blue-600 hover:text-blue-700 font-medium"
-        >
-          ← Powrót do listy
+  <div class="max-w-4xl mx-auto p-6">
+    <div class="card p-8">
+      <div class="flex items-center justify-between mb-8">
+        <div>
+          <h2 class="text-3xl font-bold text-gray-900 mb-2">Nowy Wniosek</h2>
+          <p class="text-gray-600">Wypełnij formularz, a AI pomoże w analizie</p>
+        </div>
+        <router-link to="/cases" class="text-gray-600 hover:text-gray-900 font-medium flex items-center gap-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          Powrót
         </router-link>
       </div>
       
@@ -19,8 +22,8 @@
           <input
             v-model="form.title"
             type="text"
-            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-            placeholder="np. Klub sportowy prosi o dofinansowanie hali"
+            class="input-modern"
+            placeholder="np. Hotel Marriott prosi o nadanie kategorii 4-gwiazdkowej"
             required
           />
         </div>
@@ -31,26 +34,29 @@
           </label>
           <textarea
             v-model="form.description"
-            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition resize-none"
-            rows="8"
-            placeholder="Opisz szczegóły wniosku, budżet, lokalizację, termin realizacji..."
+            class="input-modern resize-none"
+            rows="10"
+            placeholder="Opisz szczegóły wniosku: infrastruktura, usługi, standardy, dokumentacja..."
             required
           ></textarea>
-          <p class="text-xs text-gray-500 mt-1">
-            Im więcej szczegółów, tym lepsza analiza AI
+          <p class="text-xs text-gray-500 mt-2 flex items-center gap-1">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            Im więcej szczegółów, tym lepsza analiza AI i wykrywanie programów dofinansowania
           </p>
         </div>
 
-        <div class="grid grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label class="block text-sm font-semibold mb-2 text-gray-700">
-              Nazwa organizacji
+              Nazwa podmiotu
             </label>
             <input
               v-model="form.applicant_name"
               type="text"
-              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-              placeholder="Nazwa organizacji"
+              class="input-modern"
+              placeholder="np. Hotel Marriott Sp. z o.o."
             />
           </div>
           <div>
@@ -60,20 +66,30 @@
             <input
               v-model="form.applicant_nip"
               type="text"
-              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-              placeholder="NIP"
+              class="input-modern"
+              placeholder="1234567890"
             />
           </div>
         </div>
 
-        <button
-          type="submit"
-          class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 font-semibold transition shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-          :disabled="loading"
-        >
-          <span v-if="loading" class="inline-block animate-spin rounded-full h-5 w-5 border-b-2 border-white"></span>
-          {{ loading ? 'Przetwarzanie...' : 'Utwórz i Analizuj z AI' }}
-        </button>
+        <div class="pt-4">
+          <button
+            type="submit"
+            class="w-full btn-primary py-4 text-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+            :disabled="loading"
+          >
+            <span v-if="loading" class="flex items-center justify-center gap-3">
+              <span class="inline-block animate-spin rounded-full h-5 w-5 border-b-2 border-white"></span>
+              Przetwarzanie przez AI...
+            </span>
+            <span v-else class="flex items-center justify-center gap-2">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+              </svg>
+              Utwórz i Analizuj z AI
+            </span>
+          </button>
+        </div>
       </form>
     </div>
   </div>
