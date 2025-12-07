@@ -106,7 +106,7 @@ RUN rm -f /etc/nginx/conf.d/default.conf 2>/dev/null || true
 EXPOSE 80
 EXPOSE 3001
 
-# Copy startup script
+# Copy startup script - v2 with env passthrough
 COPY start.sh /app/start.sh
 RUN chmod +x /app/start.sh
 
