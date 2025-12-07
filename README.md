@@ -32,14 +32,16 @@ System automatycznie streszcza akta spraw, przypomina o terminach, generuje proj
 
 ### Wymagania wstępne
 - Node.js 18+
+- Docker i Docker Compose (opcjonalnie, do uruchamiania kontenerów)
 - Projekt Supabase
 - Klucz API OpenAI
 
-### Instalacja
+### Instalacja (bez Docker)
 
 1. **Sklonuj repozytorium**
    ```bash
-   git clone https://github.com/your-org/msit-assistant.git
+   git clone https://github.com/LachPawel/MSiT-AI-Assistant.git
+   cd MSiT-AI-Assistant
    ```
 
 2. **Konfiguracja Backend**
@@ -51,7 +53,7 @@ System automatycznie streszcza akta spraw, przypomina o terminach, generuje proj
    npm run dev
    ```
 
-3. **Konfiguracja Frontend**
+3. **Konfiguracja Frontend (nowy terminal)**
    ```bash
    cd frontend
    npm install
@@ -62,12 +64,54 @@ System automatycznie streszcza akta spraw, przypomina o terminach, generuje proj
 4. **Inicjalizacja Bazy Danych**
    Uruchom skrypt SQL znajdujący się w `database/schema.sql` w edytorze SQL Supabase.
 
+### Instalacja z Docker (Zalecane)
+
+1. **Konfiguracja środowiska**
+   ```bash
+   cp .env.example .env
+   # Edytuj .env z wartościami Supabase i OpenAI
+   ```
+
+2. **Uruchamianie z Docker Compose**
+   ```bash
+   docker-compose up -d
+   ```
+
+3. **Dostęp do aplikacji**
+   - Frontend: http://localhost:5173
+   - Backend API: http://localhost:3001
+
+Więcej informacji: zobacz `DOCKER_GUIDE.md`
+
 ## 🛡 Bezpieczeństwo i Zabezpieczenia
 
 System implementuje rygorystyczne zabezpieczenia w celu zapewnienia bezpieczeństwa:
 - **Anonimizacja Danych Osobowych:** Wszystkie dane osobowe są oczyszczane przed przetwarzaniem przez AI.
 - **Podstawy Prawne:** AI musi cytować konkretne artykuły prawne.
 - **Człowiek w Pętli:** AI nigdy nie podejmuje ostatecznych decyzji; jedynie rekomenduje.
+
+## 🐳 Wdrażanie z Docker
+
+### Lokalne testowanie
+```bash
+# Budowanie obrazów
+./docker-build.sh
+
+# Testowanie z Docker Compose
+./docker-build.sh --test
+```
+
+### Wdrażanie na Railway
+1. Push do GitHub - Railway automatycznie wykrywa Dockerfiles
+2. Railway buduje i wdraża oba kontenery
+3. Ustaw zmienne środowiskowe w dashboardzie Railway
+
+Szczegóły: `DOCKER_GUIDE.md`, `DEPLOYMENT_RAILWAY.md`
+
+### Obrazy Docker
+- **Backend**: `msit-backend:latest` (171MB)
+- **Frontend**: `msit-frontend:latest` (53.6MB)
+- Konfiguracja: `docker-compose.yml`
 
 ## Zespół
 

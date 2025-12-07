@@ -102,32 +102,6 @@ RUN mkdir -p /etc/nginx/http.d && \
 # Remove default nginx config that might conflict
 RUN rm -f /etc/nginx/conf.d/default.conf 2>/dev/null || true
 
-# Create supervisor configuration
-RUN mkdir -p /etc/supervisor.d && \
-    echo '[supervisord] \
-nodaemon=true \
-user=root \
-\
-[program:nginx] \
-command=nginx -g "daemon off;" \
-autostart=true \
-autorestart=true \
-stdout_logfile=/dev/stdout \
-stdout_logfile_maxbytes=0 \
-stderr_logfile=/dev/stderr \
-stderr_logfile_maxbytes=0 \
-\
-[program:backend] \
-command=node /app/backend/dist/server.js \
-directory=/app/backend \
-autostart=true \
-autorestart=true \
-stdout_logfile=/dev/stdout \
-stdout_logfile_maxbytes=0 \
-stderr_logfile=/dev/stderr \
-stderr_logfile_maxbytes=0 \
-environment=NODE_ENV="production",PORT="3001"' > /etc/supervisor.d/app.ini
-
 # Expose port (Railway uses PORT env variable, defaults to 80)
 EXPOSE 80
 EXPOSE 3001
