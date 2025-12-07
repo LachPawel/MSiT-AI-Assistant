@@ -3,20 +3,25 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Copy package files
-COPY package*.json ./
-COPY tsconfig.json tsconfig.node.json vite.config.ts ./
+# Copy package files first
+COPY frontend/package*.json ./
 
 # Install dependencies
 RUN npm ci
 
-# Copy source code
-COPY src ./src
-COPY index.html ./
-COPY public ./public
+# Copy all configuration files
+COPY frontend/tsconfig*.json ./
+COPY frontend/vite.config.ts .
+COPY frontend/postcss.config.js .
+COPY frontend/tailwind.config.js .
 
-# Build application
-RUN npm run build
+# Copy source and public files
+COPY frontend/index.html .
+COPY frontend/src ./src
+COPY frontend/public ./public
+
+# Build application - use Vite directly bypassing vue-tsc
+RUN npx vite build
 
 # Runtime stage - use nginx for production
 FROM nginx:alpine
